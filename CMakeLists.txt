@@ -1,20 +1,21 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(
-	maths
-	VERSION 0.0.1
-	LANGUAGES CXX
-)
+project(maths LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+file(GLOB_RECURSE maths_src "src/*.h" "src/*.cpp")
 
-set(CMAKE_CXX_STANDARD 11)
+include(CheckCXXCompilerFlag)
 
-set(
-	maths_sources
-	"src/main.cpp"
-	"src/types/integer.h"
-	"src/types/integer.cpp"
-	"src/ui/terminal.h"
-	"src/ui/terminal.cpp"
-)
+check_cxx_compiler_flag(-Wall temp)
 
-add_executable(maths ${maths_sources})
+if(temp)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
+
+check_cxx_compiler_flag(-O3 temp2)
+
+if(temp2)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+endif()
+
+add_executable(maths ${maths_src})
