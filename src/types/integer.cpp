@@ -103,6 +103,28 @@ void Integer::logdigits() const {
 	std::cout << "\n";
 }
 
+void Integer::leftshift(int n) {
+	if (n < 0) {
+		rightshift(-n);
+		return;
+	}
+
+	for (int i = 0; i < n; i++) {
+		digits.insert(digits.begin(), 0);
+	}
+}
+
+void Integer::rightshift(int n) {
+	if (n < 0) {
+		leftshift(-n);
+		return;
+	}
+
+	for (int i = 0; i < n; i++) {
+		digits.erase(digits.begin());
+	}
+}
+
 void Integer::trim() {
 	while (digits.size() > 1 && digits.back() == 0) {
 		digits.pop_back();
@@ -178,6 +200,20 @@ Integer& Integer::operator+=(Integer const & rhs) {
 	return *this;
 }
 
+Integer& Integer::operator++() {
+	*this += 1;
+
+	return *this;
+}
+
+Integer Integer::operator++(int) {
+	Integer copy(*this);
+
+	*this += 1;
+
+	return copy;
+}
+
 Integer Integer::operator-(Integer const & rhs) const {
 	return *this + (-rhs);
 }
@@ -188,6 +224,129 @@ Integer Integer::operator-() const {
 	copy.flip();
 
 	return copy;
+}
+
+Integer& Integer::operator-=(Integer const & rhs) {
+	*this = *this - rhs;
+	return *this;
+}
+
+Integer& Integer::operator--() {
+	*this -= 1;
+
+	return *this;
+}
+
+Integer Integer::operator--(int) {
+	Integer copy(*this);
+
+	*this -= 1;
+
+	return copy;
+}
+
+Integer Integer::operator*(Integer const & rhs) const {
+	Integer out(*this);
+
+	out *= rhs;
+
+	return out;
+}
+
+Integer& Integer::operator*=(Integer const & rhs) {
+	if (rhs.isnegative()) flip();
+
+	std::vector<std::uint64_t> newdigits(getNumdigits() + rhs.getNumdigits());
+
+	for (std::size_t i = 0; i < getNumdigits(); i++) {
+		for (std::size_t j = 0; j < rhs.getNumdigits(); j++) {
+			std::uint64_t res = (std::uint64_t)getNthdigit(i) * rhs.getNthdigit(j);
+
+			newdigits[i + j] += res & 0xffffffff;
+			newdigits[i + j + 1] += res >> 32;
+		}
+	}
+
+	std::uint64_t carry = 0;
+	for (std::size_t i = 0; i < newdigits.size(); i++) {
+		newdigits[i] += carry;
+
+		carry = newdigits[i] >> 32;
+
+		newdigits[i] &= 0xffffffff;
+	}
+
+	digits.clear();
+
+	for (std::size_t i = 0; i < newdigits.size(); i++) {
+		digits.push_back(newdigits[i]);
+	}
+
+	return *this;
+}
+
+Integer Integer::operator<<(std::size_t pos) const {
+	Integer out(*this);
+
+	out <<= pos;
+
+	return out;
+}
+
+Integer& Integer::operator<<=(std::size_t pos) {
+	if (pos == 0) return *this;
+
+	if (pos >= 32) {
+		leftshift(pos / 32);
+		*this <<= (pos % 32);
+
+		return *this;
+	}
+
+	digits.push_back(0);
+
+	for (int i = (int)getNumdigits() - 2; i >= 0; i--) {
+		std::uint64_t res = (std::uint64_t)digits[i] << pos;
+
+		digits[i + 1] += res >> 32;
+		digits[i] = res & 0xffffffff;
+	}
+
+	trim();
+
+	return *this;
+}
+
+Integer Integer::operator>>(std::size_t pos) const {
+	Integer out(*this);
+
+	out >>= pos;
+
+	return out;
+}
+
+Integer& Integer::operator>>=(std::size_t pos) {
+	if (pos == 0) return *this;
+
+	if (pos >= 32) {
+		rightshift(pos / 32);
+		*this >>= (pos % 32);
+
+		return *this;
+	}
+
+	std::uint32_t transfermask = 1 << pos;
+	transfermask -= 1;
+
+	for (std::size_t i = 0; i < getNumdigits(); i++) {
+		if (i > 0) {
+			digits[i - 1] += (digits[i] & transfermask) << (32 - pos);
+		}
+
+		digits[i] >>= pos;
+	}
+
+	return *this;
 }
 
 bool Integer::operator==(Integer const & rhs) const {
@@ -250,9 +409,26 @@ bool Integer::operator>=(Integer const & rhs) const {
 	return !(*this < rhs);
 }
 
+bool Integer::operator!() const {
+	return iszero();
+}
+
+std::ostream& operator<<(std::ostream& out, const Integer& n) {
+	out << n.to_string();
+
+	return out;
+}
+
 /*===== Math =====*/
 
 Integer abs(Integer x) {
 	if (x.isnegative()) return -x;
 	return x;
+}
+
+Integer gcd(Integer a, Integer b) {
+	if (a.isnegative() || b.isnegative()) return gcd(abs(a), abs(b));
+	if (a == b) return a;
+	if (a > b) return gcd(a - b, b);
+	return gcd(a, b - a);
 }
