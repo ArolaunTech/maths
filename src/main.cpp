@@ -5,10 +5,10 @@
 #include "types/rational.h"
 
 int main() {
-	Integer a = 7;
-	Integer b = 2;
+	Integer a = -500000000000;
+	Integer b = -4300000000;
 
 	std::cout << a << "\n";
-	//std::cout << (a / b).to_string() << "\n";
-	std::cout << (a << 65) << "\n";
+	std::cout << b << "\n";
+	std::cout << a / b << "\n";
 }

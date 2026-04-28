@@ -285,6 +285,54 @@ Integer& Integer::operator*=(Integer const & rhs) {
 	return *this;
 }
 
+Integer Integer::operator/(Integer const & rhs) const {
+	Integer out(*this);
+
+	out /= rhs;
+
+	return out;
+}
+
+Integer& Integer::operator/=(Integer const & rhs) {
+	if (abs(rhs) > abs(*this)) {
+		digits.clear();
+		digits.push_back(0);
+
+		return *this;
+	}
+
+	bool afternegative = isnegative() != rhs.isnegative();
+
+	//Divide magnitudes
+	std::size_t lhsdigits = getNumdigits();
+	std::size_t rhsdigits = rhs.getNumdigits();
+
+	if (isnegative()) flip();
+
+	Integer rhscopy = abs(rhs);
+	rhscopy.leftshift(lhsdigits);
+
+	std::vector<std::uint32_t> newdigits(lhsdigits - rhsdigits + 1);
+
+	for (int i = lhsdigits * 32 - 1; i >= 0; i--) {
+		*this <<= 1;
+
+		if (*this >= rhscopy) {
+			*this -= rhscopy;
+
+			newdigits[i / 32] |= 1 << (i % 32);
+		}
+	}
+
+	digits = newdigits;
+
+	trim();
+
+	if (afternegative) flip();
+
+	return *this;
+}
+
 Integer Integer::operator<<(std::size_t pos) const {
 	Integer out(*this);
 
