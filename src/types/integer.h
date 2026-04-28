@@ -50,7 +50,8 @@ public:
 	Integer& operator*=(Integer const & rhs);
 	Integer operator/(Integer const & rhs) const;
 	Integer& operator/=(Integer const & rhs);
-	//TODO: division + modulo
+	Integer operator%(Integer const & rhs) const;
+	Integer& operator%=(Integer const & rhs);
 
 	Integer operator<<(std::size_t pos) const;
 	Integer& operator<<=(std::size_t pos);

@@ -333,6 +333,20 @@ Integer& Integer::operator/=(Integer const & rhs) {
 	return *this;
 }
 
+Integer Integer::operator%(Integer const & rhs) const {
+	Integer out(*this);
+
+	out %= rhs;
+
+	return out;
+}
+
+Integer& Integer::operator%=(Integer const & rhs) {
+	*this -= rhs * (*this / rhs);
+
+	return *this;
+}
+
 Integer Integer::operator<<(std::size_t pos) const {
 	Integer out(*this);
 
@@ -476,7 +490,7 @@ Integer abs(Integer x) {
 
 Integer gcd(Integer a, Integer b) {
 	if (a.isnegative() || b.isnegative()) return gcd(abs(a), abs(b));
-	if (a == b) return a;
-	if (a > b) return gcd(a - b, b);
-	return gcd(a, b - a);
+	
+	if (b == 0) return a;
+	return gcd(b, a % b);
 }
