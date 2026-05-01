@@ -59,6 +59,7 @@ public:
 	Integer& operator>>=(std::size_t pos);
 
 	bool operator==(Integer const & rhs) const;
+	bool operator!=(Integer const & rhs) const;
 	bool operator<(Integer const & rhs) const;
 	bool operator<=(Integer const & rhs) const;
 	bool operator>(Integer const & rhs) const;
@@ -68,5 +69,6 @@ public:
 
 std::ostream& operator<<(std::ostream& out, const Integer& n);
 
-Integer abs(Integer x);
-Integer gcd(Integer a, Integer b);
+Integer abs(const Integer& x);
+Integer gcd(const Integer& a, const Integer& b);
+Integer lcm(const Integer& a, const Integer& b);

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
 
 #include "integer.h"
 
@@ -294,6 +295,10 @@ Integer Integer::operator/(Integer const & rhs) const {
 }
 
 Integer& Integer::operator/=(Integer const & rhs) {
+	if (rhs.iszero()) {
+		throw std::invalid_argument("Division by zero!");
+	}
+
 	if (abs(rhs) > abs(*this)) {
 		digits.clear();
 		digits.push_back(0);
@@ -431,6 +436,10 @@ bool Integer::operator==(Integer const & rhs) const {
 	return true;
 }
 
+bool Integer::operator!=(Integer const & rhs) const {
+	return !(*this == rhs);
+}
+
 bool Integer::operator<(Integer const & rhs) const {
 	if (*this == rhs) return false;
 
@@ -483,14 +492,18 @@ std::ostream& operator<<(std::ostream& out, const Integer& n) {
 
 /*===== Math =====*/
 
-Integer abs(Integer x) {
+Integer abs(const Integer& x) {
 	if (x.isnegative()) return -x;
 	return x;
 }
 
-Integer gcd(Integer a, Integer b) {
+Integer gcd(const Integer& a, const Integer& b) {
 	if (a.isnegative() || b.isnegative()) return gcd(abs(a), abs(b));
 	
 	if (b == 0) return a;
 	return gcd(b, a % b);
+}
+
+Integer lcm(const Integer& a, const Integer& b) {
+	return a * b / gcd(a, b);
 }
