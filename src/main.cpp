@@ -1,11 +1,17 @@
 #include <iostream>
 
 #include "ui/terminal.h"
-#include "types/integer.h"
-#include "types/rational.h"
-#include "types/expression.h"
-#include "types/statement.h"
+#include "types/all.h"
 
 int main() {
-	Space s;
+	//Space s;
+
+	//s.loadfile("test/space1.txt");
+
+	Expression e;
+	Variable x("x");
+
+	e = x;
+
+	std::cout << e.to_string() << "\n";
 }

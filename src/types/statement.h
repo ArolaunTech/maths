@@ -23,8 +23,18 @@ private:
 public:
 };
 
+class VariableAssignment : public Statement {
+private:
+	int id;
+
+	Expression value;
+public:
+};
+
 class Space {
 private:
 	std::vector<Statement> statements;
 public:
+
+	void loadfile(char const * path);
 };

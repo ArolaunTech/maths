@@ -1,0 +1,3 @@
+eq 5x+7=11
+
+goal solve x
