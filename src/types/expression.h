@@ -77,9 +77,16 @@ private:
 	std::vector<std::shared_ptr<Expression> > children;
 public:
 	Expression();
+	Expression(const Integer& x);
+	Expression(const Rational& x);
 	Expression(const Variable& x);
 
 	std::string to_string() const;
 
+	Expression operator+(Expression const & rhs) const;
+	Expression& operator+=(Expression const & rhs);
+
+	Expression& operator=(const Integer& x);
+	Expression& operator=(const Rational& x);
 	Expression& operator=(const Variable& x);
 };

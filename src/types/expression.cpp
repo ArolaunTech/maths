@@ -7,6 +7,14 @@ Expression::Expression() {
 	data = std::make_shared<EmptyNode>();
 }
 
+Expression::Expression(const Integer& x) {
+	*this = x;
+}
+
+Expression::Expression(const Rational& x) {
+	*this = x;
+}
+
 Expression::Expression(const Variable& x) {
 	*this = x;
 }
@@ -18,6 +26,8 @@ std::string Expression::to_string() const {
 		if (!op) return "";
 
 		switch (op->getoptype()) {
+		case OP_ADD:
+			return children[0]->to_string() + " + " + children[1]->to_string();
 		default:
 			return "";
 		}
@@ -26,9 +36,47 @@ std::string Expression::to_string() const {
 	return data->to_string();
 }
 
+Expression Expression::operator+(Expression const & rhs) const {
+	Expression copy(*this);
+
+	copy += rhs;
+
+	return copy;
+}
+
+Expression& Expression::operator+=(Expression const & rhs) {
+	std::vector<std::shared_ptr<Expression> > newchildren;
+
+	newchildren.push_back(std::make_shared<Expression>(*this));
+	newchildren.push_back(std::make_shared<Expression>(rhs));
+
+	children = newchildren;
+
+	data = std::make_shared<OpNode>(OP_ADD);
+
+	return *this;
+}
+
+Expression& Expression::operator=(const Integer& x) {
+	Rational copy(x, 1);
+	data = std::make_shared<RationalNode>(copy);
+	children.clear();
+
+	return *this;
+}
+
+Expression& Expression::operator=(const Rational& x) {
+	Rational copy(x);
+	data = std::make_shared<RationalNode>(copy);
+	children.clear();
+
+	return *this;
+}
+
 Expression& Expression::operator=(const Variable& x) {
 	Variable copy(x);
 	data = std::make_shared<VariableNode>(copy);
+	children.clear();
 
 	return *this;
 }
