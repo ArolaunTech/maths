@@ -11,7 +11,13 @@ enum OpType {
 	OP_ADD,
 	OP_SUB,
 	OP_MUL,
-	OP_DIV
+	OP_DIV,
+	OP_POW,
+	OP_LN,
+	OP_LOG10,
+	OP_LOG,
+	OP_EXP,
+	OP_SQRT
 };
 
 enum NodeType {
@@ -81,10 +87,21 @@ public:
 	Expression(const Rational& x);
 	Expression(const Variable& x);
 
+	NodeType gettype() const;
+
 	std::string to_string() const;
 
 	Expression operator+(Expression const & rhs) const;
 	Expression& operator+=(Expression const & rhs);
+
+	Expression operator-(Expression const & rhs) const;
+	Expression& operator-=(Expression const & rhs);
+
+	Expression operator*(Expression const & rhs) const;
+	Expression& operator*=(Expression const & rhs);
+
+	Expression operator/(Expression const & rhs) const;
+	Expression& operator/=(Expression const & rhs);
 
 	Expression& operator=(const Integer& x);
 	Expression& operator=(const Rational& x);

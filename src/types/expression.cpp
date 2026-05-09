@@ -19,15 +19,39 @@ Expression::Expression(const Variable& x) {
 	*this = x;
 }
 
+NodeType Expression::gettype() const {
+	return data->gettype();
+}
+
 std::string Expression::to_string() const {
 	if (data->gettype() == NODE_OP) {
 		std::shared_ptr<OpNode> op = std::dynamic_pointer_cast<OpNode>(data);
 
 		if (!op) return "";
 
+		std::vector<std::string> childrenstrings;
+
+		for (std::size_t i = 0; i < children.size(); i++) {
+			childrenstrings.push_back(children[i]->to_string());
+		}
+
 		switch (op->getoptype()) {
 		case OP_ADD:
-			return children[0]->to_string() + " + " + children[1]->to_string();
+			return childrenstrings[0] + " + " + childrenstrings[1];
+		case OP_SUB:
+			return childrenstrings[0] + " - " + childrenstrings[1];
+		case OP_MUL:
+			if (children[0]->gettype() == NODE_VARIABLE && children[1]->gettype() == NODE_RATIONAL) {
+				return childrenstrings[1] + childrenstrings[0];
+			}
+
+			if (children[1]->gettype() == NODE_VARIABLE && children[0]->gettype() == NODE_RATIONAL) {
+				return childrenstrings[0] + childrenstrings[1];
+			}
+
+			return "(" + childrenstrings[0] + ") * (" + childrenstrings[1] + ")";
+		case OP_DIV:
+			return "(" + childrenstrings[0] + ") / (" + childrenstrings[1] + ")";
 		default:
 			return "";
 		}
@@ -53,6 +77,69 @@ Expression& Expression::operator+=(Expression const & rhs) {
 	children = newchildren;
 
 	data = std::make_shared<OpNode>(OP_ADD);
+
+	return *this;
+}
+
+Expression Expression::operator-(Expression const & rhs) const {
+	Expression copy(*this);
+
+	copy -= rhs;
+
+	return copy;
+}
+
+Expression& Expression::operator-=(Expression const & rhs) {
+	std::vector<std::shared_ptr<Expression> > newchildren;
+
+	newchildren.push_back(std::make_shared<Expression>(*this));
+	newchildren.push_back(std::make_shared<Expression>(rhs));
+
+	children = newchildren;
+
+	data = std::make_shared<OpNode>(OP_SUB);
+
+	return *this;
+}
+
+Expression Expression::operator*(Expression const & rhs) const {
+	Expression copy(*this);
+
+	copy *= rhs;
+
+	return copy;
+}
+
+Expression& Expression::operator*=(Expression const & rhs) {
+	std::vector<std::shared_ptr<Expression> > newchildren;
+
+	newchildren.push_back(std::make_shared<Expression>(*this));
+	newchildren.push_back(std::make_shared<Expression>(rhs));
+
+	children = newchildren;
+
+	data = std::make_shared<OpNode>(OP_MUL);
+
+	return *this;
+}
+
+Expression Expression::operator/(Expression const & rhs) const {
+	Expression copy(*this);
+
+	copy /= rhs;
+
+	return copy;
+}
+
+Expression& Expression::operator/=(Expression const & rhs) {
+	std::vector<std::shared_ptr<Expression> > newchildren;
+
+	newchildren.push_back(std::make_shared<Expression>(*this));
+	newchildren.push_back(std::make_shared<Expression>(rhs));
+
+	children = newchildren;
+
+	data = std::make_shared<OpNode>(OP_DIV);
 
 	return *this;
 }
