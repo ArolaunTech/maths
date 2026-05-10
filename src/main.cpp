@@ -15,7 +15,7 @@ int main() {
 	e = x;
 	e2 = five;
 
-	e3 = e * e2 / six;
+	e3 = six / (e * e2);
 
 	std::cout << e.to_string() << "\n";
 	std::cout << e2.to_string() << "\n";

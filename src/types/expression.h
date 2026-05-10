@@ -1,6 +1,8 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <limits>
 
 #include "rational.h"
 #include "variable.h"
@@ -8,6 +10,7 @@
 #pragma once
 
 enum OpType {
+	OP_NULL,
 	OP_ADD,
 	OP_SUB,
 	OP_MUL,
@@ -18,6 +21,20 @@ enum OpType {
 	OP_LOG,
 	OP_EXP,
 	OP_SQRT
+};
+
+const std::unordered_map<OpType, int> oppriorities = {
+	{OP_NULL, 0},
+	{OP_ADD, 1},
+	{OP_SUB, 1},
+	{OP_MUL, 2},
+	{OP_DIV, 2},
+	{OP_POW, 3},
+	{OP_LN, std::numeric_limits<int>::max()},
+	{OP_LOG10, std::numeric_limits<int>::max()},
+	{OP_LOG, std::numeric_limits<int>::max()},
+	{OP_EXP, std::numeric_limits<int>::max()},
+	{OP_SQRT, std::numeric_limits<int>::max()}
 };
 
 enum NodeType {
@@ -88,22 +105,21 @@ public:
 	Expression(const Variable& x);
 
 	NodeType gettype() const;
+	OpType getoptype() const;
 
 	std::string to_string() const;
 
-	Expression operator+(Expression const & rhs) const;
 	Expression& operator+=(Expression const & rhs);
-
-	Expression operator-(Expression const & rhs) const;
 	Expression& operator-=(Expression const & rhs);
-
-	Expression operator*(Expression const & rhs) const;
 	Expression& operator*=(Expression const & rhs);
-
-	Expression operator/(Expression const & rhs) const;
 	Expression& operator/=(Expression const & rhs);
 
 	Expression& operator=(const Integer& x);
 	Expression& operator=(const Rational& x);
 	Expression& operator=(const Variable& x);
 };
+
+Expression operator+(Expression const & lhs, Expression const & rhs);
+Expression operator-(Expression const & lhs, Expression const & rhs);
+Expression operator*(Expression const & lhs, Expression const & rhs);
+Expression operator/(Expression const & lhs, Expression const & rhs);
